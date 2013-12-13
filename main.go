@@ -6,11 +6,13 @@ import (
 	"math/rand"
 	"strconv"
 	"github.com/hoisie/web"
+	"net/http"
 	"time"
 )
 
 var (
 	valid_chars = []rune{'a', 'b', 'c', 'd', 'e', 'f', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
+	valid_strings = []string{"a", "b", "c", "d", "e", "f", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
@@ -40,10 +42,23 @@ func getPassword(countstr string) string {
 	return string(passwd)
 }
 
+func getPassword_B(ctx *web.Context, countstr string) {
+	flusher, _ := ctx.ResponseWriter.(http.Flusher)
+	flusher.Flush()
+
+	count, _ := strconv.ParseInt(countstr, 10, 64)
+	var i int64
+
+	for i = 0; i < count; i++ {
+		ctx.WriteString(valid_strings[r.Intn(len(valid_strings))])
+		flusher.Flush()
+	}
+}
+
 func main () {
 	w := web.NewServer()
 
-	w.Get("/([0-9]+)", getPassword)
+	w.Get("/([0-9]+)", getPassword_B)
 
 	go w.Run(":8002")
 	awaitQuitKey()
