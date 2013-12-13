@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"log"
 	"math/rand"
 	"strconv"
